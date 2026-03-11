@@ -75,14 +75,30 @@ class ThermalLabelStudio(ctk.CTk):
             return default
 
     def setup_ui(self):
+        self.grid_columnconfigure(0, minsize=300)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.tab_view = ctk.CTkTabview(self, width=280, corner_radius=0)
-        self.tab_view.grid(row=0, column=0, sticky="nsew")
+        self.tab_view = ctk.CTkTabview(
+            self, 
+            width=280, 
+            corner_radius=12,
+            fg_color="transparent",
+            segmented_button_fg_color="#242424",
+            segmented_button_selected_color="#2980b9",
+            segmented_button_selected_hover_color="#3498db",
+            segmented_button_unselected_color="#242424",
+            segmented_button_unselected_hover_color="#2b2b2b",
+            text_color="#ecf0f1"
+        )
+        self.tab_view.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         
-        self.tab_designer = self.tab_view.add("Designer")
-        self.tab_config = self.tab_view.add("Configuration")
+        # Access internal segmented button directly to force max border radius and padding
+        if hasattr(self.tab_view, "_segmented_button"):
+            self.tab_view._segmented_button.configure(corner_radius=12)
+        
+        self.tab_designer = self.tab_view.add("  Designer  ")
+        self.tab_config = self.tab_view.add("  Configuration  ")
 
         # --- DESIGNER TAB ---
         img_frame = self.create_group_frame(self.tab_designer, "Image Controls")
@@ -191,7 +207,7 @@ class ThermalLabelStudio(ctk.CTk):
 
     def create_slider(self, parent, label, low, high, var, row):
         ctk.CTkLabel(parent, text=label, font=("Arial", 10)).grid(row=row, column=0, sticky="w")
-        ctk.CTkSlider(parent, from_=low, to=high, variable=var, height=12, command=lambda _: self.update_preview()).grid(row=row, column=1, sticky="e")
+        ctk.CTkSlider(parent, from_=low, to=high, variable=var, width=120, height=12, command=lambda _: self.update_preview()).grid(row=row, column=1, sticky="e")
 
     def load_image_dialog(self):
         path = filedialog.askopenfilename(filetypes=[("Images", "*.png *.jpg *.jpeg *.bmp")])
