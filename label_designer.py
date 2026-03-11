@@ -155,6 +155,28 @@ class ThermalLabelStudio(ctk.CTk):
         
         self.canvas.bind("<Button-3>", self.start_drag)
         self.canvas.bind("<B3-Motion>", self.drag_rotate)
+        
+        # Overlay for instructions
+        self.overlay_frame = ctk.CTkFrame(self.canvas, corner_radius=8, fg_color="#2b2b2b", bg_color="#1a1a1a")
+        
+        self.overlay_label = ctk.CTkLabel(
+            self.overlay_frame, 
+            text="L-Click + Drag: Move\nR-Click + Drag: Rotate\nScroll: Scale", 
+            font=ctk.CTkFont(size=11), 
+            text_color="#b0b0b0",
+            justify="left"
+        )
+        self.overlay_label.pack(padx=10, pady=8)
+        
+        # Bind hover events to show/hide the overlay
+        self.canvas.bind("<Enter>", self.show_overlay)
+        self.canvas.bind("<Leave>", self.hide_overlay)
+
+    def show_overlay(self, event=None):
+        self.overlay_frame.place(relx=0.98, rely=0.02, anchor="ne")
+        
+    def hide_overlay(self, event=None):
+        self.overlay_frame.place_forget()
 
     def start_drag(self, event):
         self._drag_data = {"x": event.x, "y": event.y}
