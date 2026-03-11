@@ -166,7 +166,19 @@ class ThermalLabelStudio(ctk.CTk):
             text_color="#b0b0b0",
             justify="left"
         )
-        self.overlay_label.pack(padx=10, pady=8)
+        self.overlay_label.pack(padx=10, pady=(8, 2))
+        
+        self.reset_btn = ctk.CTkButton(
+            self.overlay_frame, 
+            text="Reset Edits", 
+            font=ctk.CTkFont(size=10, weight="bold"),
+            width=80, 
+            height=20, 
+            fg_color="#c0392b", 
+            hover_color="#e74c3c",
+            command=self.reset_image_edits
+        )
+        self.reset_btn.pack(padx=10, pady=(2, 8))
         
         # Bind hover events to show/hide the overlay
         self.canvas.bind("<Enter>", self.show_overlay)
@@ -176,7 +188,22 @@ class ThermalLabelStudio(ctk.CTk):
         self.overlay_frame.place(relx=0.98, rely=0.02, anchor="ne")
         
     def hide_overlay(self, event=None):
+        if event and event.widget == self.canvas:
+            x, y = event.x, event.y
+            if 0 <= x <= self.canvas.winfo_width() and 0 <= y <= self.canvas.winfo_height():
+                return
         self.overlay_frame.place_forget()
+
+    def reset_image_edits(self):
+        self.pos_x.set(0)
+        self.pos_y.set(0)
+        self.img_scale.set(1.0)
+        self.img_rotation.set(0.0)
+        self.img_contrast.set(1.0)
+        self.threshold.set(128)
+        self.dither_mode.set("Floyd-Steinberg")
+        self.update_preview()
+        self.save_settings()
 
     def start_drag(self, event):
         self._drag_data = {"x": event.x, "y": event.y}
