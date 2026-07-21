@@ -22,7 +22,7 @@ class ThermalLabelStudio(ctk.CTk):
         ctk.set_appearance_mode("Dark")
         ctk.set_default_color_theme("blue")
 
-        self.title("Thermal Label Studio (Interactive)")
+        self.title("Thermal Label Studio v1")
         self.geometry("700x450") 
         self.minsize(700, 450)
         

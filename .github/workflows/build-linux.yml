@@ -3,9 +3,14 @@ name: Build ThermalLabelStudio (Linux)
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*' # Automatically triggers on version tags like v1.0, v1.0.0, etc.
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: 
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -26,7 +31,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          # cache: 'pip' # Uncomment this line if you created a requirements.txt file earlier
 
       # 3. Install Python Packages
       - name: Install dependencies
@@ -49,10 +53,19 @@ jobs:
                   label_designer.py
           fi
 
-      # 5. Upload the generated executable
+      # 5. Upload to Workflow Artifacts (For temporary testing)
       - name: Upload Executable Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ThermalLabelStudio-Linux-Binary
           path: dist/
           if-no-files-found: error
+
+      # 6. Upload directly to GitHub RELEASES (Only runs when a Git tag is pushed)
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
