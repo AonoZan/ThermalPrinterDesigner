@@ -1,0 +1,58 @@
+name: Build ThermalLabelStudio (Linux)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Install System Dependencies required for Linux GUI (Tkinter)
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk build-essential
+
+      # 2. Setup Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          # cache: 'pip' # Uncomment this line if you created a requirements.txt file earlier
+
+      # 3. Install Python Packages
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install customtkinter pillow python-escpos numpy pyusb libusb-package pyinstaller
+
+      # 4. Compile with PyInstaller
+      - name: Compile with PyInstaller
+        run: |
+          if [ -f "build.spec" ]; then
+              echo "Spec file found. Building from build.spec..."
+              pyinstaller --noconfirm "build.spec"
+          else
+              echo "Warning: Spec file not found. Using manual flags."
+              pyinstaller --noconfirm --onefile --windowed \
+                  --collect-all customtkinter \
+                  --collect-all libusb_package \
+                  --hidden-import PIL._tkinter_finder \
+                  label_designer.py
+          fi
+
+      # 5. Upload the generated executable
+      - name: Upload Executable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ThermalLabelStudio-Linux-Binary
+          path: dist/
+          if-no-files-found: error
