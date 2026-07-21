@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11' # Change this to your preferred Python version
-          cache: 'pip'           # Caches packages to speed up future builds
 
       # 3. Install Python Packages
       - name: Install dependencies
